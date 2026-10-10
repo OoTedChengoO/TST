@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>影片快捷導航</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-hover: #334155;
+      --text: #f8fafc;
+      --sub: #94a3b8;
+      --accent: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 32px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--sub);
+      font-size: 0.9rem;
+    }
+
+    .search-bar {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-input {
+      width: 100%;
+      max-width: 420px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background-color: var(--card-bg);
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .poster-box {
+      width: 100%;
+      height: 180px;
+      background-color: #000;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+    }
+
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .card:hover .play-overlay {
+      opacity: 1;
+    }
+
+    .play-icon {
+      width: 44px;
+      height: 44px;
+      fill: #fff;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+    }
+
+    .card-info {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .link-text {
+      font-size: 0.75rem;
+      color: var(--sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>影片捷徑清單</h1>
+      <p>點擊封面卡片即可直接開啟對應播放頁面</p>
+      <div class="search-bar">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜尋番號...">
+      </div>
+    </header>
+
+    <div class="grid" id="links-grid"></div>
+  </div>
+
+  <script>
+    const links = [
+      "https://missav.ws/dm18/aka-031",
+      "https://missav.ws/dm13/luxu-886",
+      "https://missav.ws/dm13/luxu-422",
+      "https://missav.ws/dm31/sdsi-054",
+      "https://missav.ws/dm18/yrh-052",
+      "https://missav.ws/dm71/ipz-219",
+      "https://missav.ws/dm72/ipz-197",
+      "https://missav.ws/dm33/dtt-045",
+      "https://missav.ws/dm31/dtt-062",
+      "https://missav.ws/dm58/cjod-047",
+      "https://missav.ws/dm26/259luxu-1204",
+      "https://missav.ws/dm26/259luxu-831",
+      "https://missav.ws/dm13/yrh-044",
+      "https://missav.ws/dm13/yal-026",
+      "https://missav.ws/luxu-389",
+      "https://missav.ws/dm5/aka-051",
+      "https://missav.ws/dm19/abp-353",
+      "https://missav.ws/dm18/chn-123",
+      "https://missav.ws/dm18/hiz-015",
+      "https://missav.ws/dm18/mifd-145",
+      "https://missav.ws/dm19/fc2ppv-1515992",
+      "https://missav.ws/dm20/pred-289",
+      "https://missav.ws/dm20/pred-279",
+      "https://missav.ws/dm20/juy-071",
+      "https://missav.ws/dm21/juy-213",
+      "https://missav.ws/dm31/star-985",
+      "https://missav.ws/dm23/abw-062",
+      "https://missav.ws/dm13/mide-513",
+      "https://missav.ws/dm20/428suke-022c",
+      "https://missav.ws/dm18/meyd-392",
+      "https://missav.ws/dm20/nhdtb-161",
+      "https://missav.ws/dm24/shkd-748",
+      "https://missav.ws/dm26/abp-968",
+      "https://missav.ws/dm13/agav-054",
+      "https://missav.ws/dm27/iptd-991",
+      "https://missav.ws/dm27/iptd-950",
+      "https://missav.ws/dm27/ipz-266",
+      "https://missav.ws/dm27/pred-316",
+      "https://missav.ws/dm27/mdyd-716",
+      "https://missav.ws/dm27/mxgs-994",
+      "https://missav.ws/dm27/ssni-827",
+      "https://missav.ws/dm28/ipx-620",
+      "https://missav.ws/dm28/ipz-514",
+      "https://missav.ws/dm28/team-067",
+      "https://missav.ws/dm28/abp-895",
+      "https://missav.ws/dm28/rctd-082",
+      "https://missav.ws/dm13/mide-007",
+      "https://missav.ws/dm28/mxgs-899c",
+      "https://missav.ws/dm28/ssis-700",
+      "https://missav.ws/dm30/ekdv-569c",
+      "https://missav.ws/dm26/ipz-679",
+      "https://missav.ws/dm28/mxgs-1078",
+      "https://missav.ws/dm30/abp-242",
+      "https://missav.ws/dm30/star-395",
+      "https://missav.ws/dm31/fsdss-320",
+      "https://missav.ws/dm30/fsdss-275",
+      "https://missav.ws/dm31/ipx-343",
+      "https://missav.ws/dm31/ssni-884",
+      "https://missav.ws/dm30/mxbd-123",
+      "https://missav.ws/dm31/sdmu-866",
+      "https://missav.ws/dm30/star-395",
+      "https://missav.ws/dm65/ipx-143",
+      "https://missav.ws/dm33/snis-665",
+      "https://missav.ws/dm33/sdsi-031",
+      "https://missav.ws/dm33/stars-918",
+      "https://missav.ws/dm33/dv-1506",
+      "https://missav.ws/dm33/dvdms-658",
+      "https://missav.ws/dm33/sdde-526",
+      "https://missav.ws/dm33/ipz-550",
+      "https://missav.ws/dm33/abw-147",
+      "https://missav.ws/dm33/ipx-816",
+      "https://missav.ws/dm34/ipx-506",
+      "https://missav.ws/dm23/abw-062",
+      "https://missav.ws/dm13/home-005",
+      "https://missav.ws/dm34/fc2-ppv-985146",
+      "https://missav.ws/dm34/fc2-ppv-2884568",
+      "https://missav.ws/dm34/dldss-008",
+      "https://missav.ws/dm34/juy-942",
+      "https://missav.ws/dm34/259luxu-1463",
+      "https://missav.ws/dm34/real-774",
+      "https://missav.ws/dm34/miaa-302",
+      "https://missav.ws/dm35/fc2-ppv-1050737",
+      "https://missav.ws/dm35/494sika-109",
+      "https://missav.ws/dm35/fc2-ppv-2855673",
+      "https://missav.ws/dm35/jbs-023",
+      "https://missav.ws/dm35/abw-108",
+      "https://missav.ws/dm35/300maan-244",
+      "https://missav.ws/dm35/ipx-772",
+      "https://missav.ws/dm35/fc2-ppv-2977094",
+      "https://missav.ws/dm35/ipx-564",
+      "https://missav.ws/dm35/ipx-867",
+      "https://missav.ws/dm31/vgd-209",
+      "https://missav.ws/dm87/mide-834",
+      "https://missav.ws/dm28/apak-233",
+      "https://missav.ws/dm27/fc2-ppv-2724256",
+      "https://missav.ws/dm27/fc2-ppv-2589532",
+      "https://missav.ws/dm26/200gana-2076",
+      "https://missav.ws/dm55/fc2ppv3074549",
+      "https://missav.ws/dm102/nnpj-303",
+      "https://missav.ws/dm26/sdnm-015",
+      "https://missav.ws/dm13/sdnm-312",
+      "https://missav.ws/dm43/stars-541",
+      "https://missav.ws/dm26/siro-4936",
+      "https://missav.ws/dm55/fc2ppv-746281",
+      "https://missav.ws/dm85/juy-919",
+      "https://missav.ws/dm55/ssis-365"
+    ];
+
+    const grid = document.getElementById("links-grid");
+    const uniqueLinks = [...new Set(links)];
+
+    function renderCards(list) {
+      grid.innerHTML = "";
+      list.forEach(url => {
+        const code = url.split("/").filter(Boolean).pop().toLowerCase();
+        const posterUrl = `https://fourhoi.com/${code}/cover-n.jpg`;
+
+        const card = document.createElement("a");
+        card.href = url;
+        card.target = "_blank";
+        card.rel = "noopener noreferrer";
+        card.className = "card";
+
+        card.innerHTML = `
+          <div class="poster-box" style="background-image: url('${posterUrl}');">
+            <div class="play-overlay">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+          <div class="card-info">
+            <span class="tag">${code}</span>
+            <span class="link-text">${url}</span>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    renderCards(uniqueLinks);
+
+    // 即時關鍵字搜尋功能
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      const filtered = uniqueLinks.filter(url => {
+        const code = url.split("/").filter(Boolean).pop().toLowerCase();
+        return code.includes(query) || url.toLowerCase().includes(query);
+      });
+      renderCards(filtered);
+    });
+  </script>
+</body>
+</html>
