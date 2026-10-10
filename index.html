@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
   <title>影片快捷導航</title>
   <style>
     :root {
@@ -12,6 +13,7 @@
       --text: #f8fafc;
       --sub: #94a3b8;
       --accent: #38bdf8;
+      --actress-color: #f472b6;
     }
 
     * {
@@ -55,7 +57,7 @@
 
     .search-input {
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       padding: 10px 16px;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.15);
@@ -134,19 +136,37 @@
       gap: 6px;
     }
 
+    .tag-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .tag {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--accent);
       text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .actress {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--actress-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
     }
 
     .link-text {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--sub);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin-top: 4px;
     }
   </style>
 </head>
@@ -157,7 +177,7 @@
       <h1>影片捷徑清單</h1>
       <p>點擊封面卡片即可直接開啟對應播放頁面</p>
       <div class="search-bar">
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜尋番號...">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜尋番號或女優...">
       </div>
     </header>
 
@@ -165,129 +185,661 @@
   </div>
 
   <script>
-    const links = [
-      "https://missav.ws/dm18/aka-031",
-      "https://missav.ws/dm13/luxu-886",
-      "https://missav.ws/dm13/luxu-422",
-      "https://missav.ws/dm31/sdsi-054",
-      "https://missav.ws/dm18/yrh-052",
-      "https://missav.ws/dm71/ipz-219",
-      "https://missav.ws/dm72/ipz-197",
-      "https://missav.ws/dm33/dtt-045",
-      "https://missav.ws/dm31/dtt-062",
-      "https://missav.ws/dm58/cjod-047",
-      "https://missav.ws/dm26/259luxu-1204",
-      "https://missav.ws/dm26/259luxu-831",
-      "https://missav.ws/dm13/yrh-044",
-      "https://missav.ws/dm13/yal-026",
-      "https://missav.ws/luxu-389",
-      "https://missav.ws/dm5/aka-051",
-      "https://missav.ws/dm19/abp-353",
-      "https://missav.ws/dm18/chn-123",
-      "https://missav.ws/dm18/hiz-015",
-      "https://missav.ws/dm18/mifd-145",
-      "https://missav.ws/dm19/fc2ppv-1515992",
-      "https://missav.ws/dm20/pred-289",
-      "https://missav.ws/dm20/pred-279",
-      "https://missav.ws/dm20/juy-071",
-      "https://missav.ws/dm21/juy-213",
-      "https://missav.ws/dm31/star-985",
-      "https://missav.ws/dm23/abw-062",
-      "https://missav.ws/dm13/mide-513",
-      "https://missav.ws/dm20/428suke-022c",
-      "https://missav.ws/dm18/meyd-392",
-      "https://missav.ws/dm20/nhdtb-161",
-      "https://missav.ws/dm24/shkd-748",
-      "https://missav.ws/dm26/abp-968",
-      "https://missav.ws/dm13/agav-054",
-      "https://missav.ws/dm27/iptd-991",
-      "https://missav.ws/dm27/iptd-950",
-      "https://missav.ws/dm27/ipz-266",
-      "https://missav.ws/dm27/pred-316",
-      "https://missav.ws/dm27/mdyd-716",
-      "https://missav.ws/dm27/mxgs-994",
-      "https://missav.ws/dm27/ssni-827",
-      "https://missav.ws/dm28/ipx-620",
-      "https://missav.ws/dm28/ipz-514",
-      "https://missav.ws/dm28/team-067",
-      "https://missav.ws/dm28/abp-895",
-      "https://missav.ws/dm28/rctd-082",
-      "https://missav.ws/dm13/mide-007",
-      "https://missav.ws/dm28/mxgs-899c",
-      "https://missav.ws/dm28/ssis-700",
-      "https://missav.ws/dm30/ekdv-569c",
-      "https://missav.ws/dm26/ipz-679",
-      "https://missav.ws/dm28/mxgs-1078",
-      "https://missav.ws/dm30/abp-242",
-      "https://missav.ws/dm30/star-395",
-      "https://missav.ws/dm31/fsdss-320",
-      "https://missav.ws/dm30/fsdss-275",
-      "https://missav.ws/dm31/ipx-343",
-      "https://missav.ws/dm31/ssni-884",
-      "https://missav.ws/dm30/mxbd-123",
-      "https://missav.ws/dm31/sdmu-866",
-      "https://missav.ws/dm30/star-395",
-      "https://missav.ws/dm65/ipx-143",
-      "https://missav.ws/dm33/snis-665",
-      "https://missav.ws/dm33/sdsi-031",
-      "https://missav.ws/dm33/stars-918",
-      "https://missav.ws/dm33/dv-1506",
-      "https://missav.ws/dm33/dvdms-658",
-      "https://missav.ws/dm33/sdde-526",
-      "https://missav.ws/dm33/ipz-550",
-      "https://missav.ws/dm33/abw-147",
-      "https://missav.ws/dm33/ipx-816",
-      "https://missav.ws/dm34/ipx-506",
-      "https://missav.ws/dm23/abw-062",
-      "https://missav.ws/dm13/home-005",
-      "https://missav.ws/dm34/fc2-ppv-985146",
-      "https://missav.ws/dm34/fc2-ppv-2884568",
-      "https://missav.ws/dm34/dldss-008",
-      "https://missav.ws/dm34/juy-942",
-      "https://missav.ws/dm34/259luxu-1463",
-      "https://missav.ws/dm34/real-774",
-      "https://missav.ws/dm34/miaa-302",
-      "https://missav.ws/dm35/fc2-ppv-1050737",
-      "https://missav.ws/dm35/494sika-109",
-      "https://missav.ws/dm35/fc2-ppv-2855673",
-      "https://missav.ws/dm35/jbs-023",
-      "https://missav.ws/dm35/abw-108",
-      "https://missav.ws/dm35/300maan-244",
-      "https://missav.ws/dm35/ipx-772",
-      "https://missav.ws/dm35/fc2-ppv-2977094",
-      "https://missav.ws/dm35/ipx-564",
-      "https://missav.ws/dm35/ipx-867",
-      "https://missav.ws/dm31/vgd-209",
-      "https://missav.ws/dm87/mide-834",
-      "https://missav.ws/dm28/apak-233",
-      "https://missav.ws/dm27/fc2-ppv-2724256",
-      "https://missav.ws/dm27/fc2-ppv-2589532",
-      "https://missav.ws/dm26/200gana-2076",
-      "https://missav.ws/dm55/fc2ppv3074549",
-      "https://missav.ws/dm102/nnpj-303",
-      "https://missav.ws/dm26/sdnm-015",
-      "https://missav.ws/dm13/sdnm-312",
-      "https://missav.ws/dm43/stars-541",
-      "https://missav.ws/dm26/siro-4936",
-      "https://missav.ws/dm55/fc2ppv-746281",
-      "https://missav.ws/dm85/juy-919",
-      "https://missav.ws/dm55/ssis-365"
-    ];
+    const items = [
+  {
+    "url": "https://missav.ws/dm55/494sika-109",
+    "code": "494SIKA-109",
+    "poster_code": "494sika-109",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm31/abp-242",
+    "code": "ABP-242",
+    "poster_code": "abp-242",
+    "actress": "朝日奈瑠美奈 (芽森滴) (朝日奈るみな（芽森しずく）)"
+  },
+  {
+    "url": "https://missav.ws/dm19/abp-353",
+    "code": "ABP-353",
+    "poster_code": "abp-353",
+    "actress": "冬月楓 (冬月かえで)"
+  },
+  {
+    "url": "https://missav.ws/dm31/abp-895",
+    "code": "ABP-895",
+    "poster_code": "abp-895",
+    "actress": "愛音麻里亞 (愛音まりあ)"
+  },
+  {
+    "url": "https://missav.ws/dm18/abp-968",
+    "code": "ABP-968",
+    "poster_code": "abp-968",
+    "actress": "涼森玲夢 (涼森れむ)"
+  },
+  {
+    "url": "https://missav.ws/dm31/abw-062",
+    "code": "ABW-062",
+    "poster_code": "abw-062",
+    "actress": "鈴村愛里 (鈴村あいり)"
+  },
+  {
+    "url": "https://missav.ws/dm31/abw-062",
+    "code": "ABW-062",
+    "poster_code": "abw-062",
+    "actress": "鈴村愛里 (鈴村あいり)"
+  },
+  {
+    "url": "https://missav.ws/dm26/abw-108",
+    "code": "ABW-108",
+    "poster_code": "abw-108",
+    "actress": "涼森玲夢 (涼森れむ)"
+  },
+  {
+    "url": "https://missav.ws/dm27/abw-147",
+    "code": "ABW-147",
+    "poster_code": "abw-147",
+    "actress": "八挂うみ (八掛うみ)"
+  },
+  {
+    "url": "https://missav.ws/dm28/agav-054",
+    "code": "AGAV-054",
+    "poster_code": "agav-054",
+    "actress": "桐山結羽"
+  },
+  {
+    "url": "https://missav.ws/dm18/aka-031",
+    "code": "AKA-031",
+    "poster_code": "aka-031",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm5/aka-051",
+    "code": "AKA-051",
+    "poster_code": "aka-051",
+    "actress": "赤木碧 (あかぎ碧)"
+  },
+  {
+    "url": "https://missav.ws/dm28/apak-233",
+    "code": "APAK-233",
+    "poster_code": "apak-233",
+    "actress": "小日嚮郁美 (小日向郁美)"
+  },
+  {
+    "url": "https://missav.ws/dm18/chn-123",
+    "code": "CHN-123",
+    "poster_code": "chn-123",
+    "actress": "岸田步美 (岸田歩美)"
+  },
+  {
+    "url": "https://missav.ws/dm58/cjod-047",
+    "code": "CJOD-047",
+    "poster_code": "cjod-047",
+    "actress": "高瀨由奈 (たかせ由奈)"
+  },
+  {
+    "url": "https://missav.ws/dm31/dldss-008",
+    "code": "DLDSS-008",
+    "poster_code": "dldss-008",
+    "actress": "東凛"
+  },
+  {
+    "url": "https://missav.ws/dm33/dtt-045",
+    "code": "DTT-045",
+    "poster_code": "dtt-045",
+    "actress": "佐伯茜 (佐伯あかね)"
+  },
+  {
+    "url": "https://missav.ws/dm31/dtt-062",
+    "code": "DTT-062",
+    "poster_code": "dtt-062",
+    "actress": "財前花戀 (財前カレン)"
+  },
+  {
+    "url": "https://missav.ws/dm15/dv-1506",
+    "code": "DV-1506",
+    "poster_code": "dv-1506",
+    "actress": "前原友紀"
+  },
+  {
+    "url": "https://missav.ws/dm29/dvdms-658",
+    "code": "DVDMS-658",
+    "poster_code": "dvdms-658",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm31/ekdv-569",
+    "code": "EKDV-569",
+    "poster_code": "ekdv-569",
+    "actress": "有坂深雪"
+  },
+  {
+    "url": "https://missav.ws/dm27/fc2-ppv-2589532",
+    "code": "FC2-PPV-2589532",
+    "poster_code": "fc2-ppv-2589532",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm27/fc2-ppv-2724256",
+    "code": "FC2-PPV-2724256",
+    "poster_code": "fc2-ppv-2724256",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm26/fc2-ppv-2855673",
+    "code": "FC2-PPV-2855673",
+    "poster_code": "fc2-ppv-2855673",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm26/fc2-ppv-2884568",
+    "code": "FC2-PPV-2884568",
+    "poster_code": "fc2-ppv-2884568",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm26/fc2-ppv-2977094",
+    "code": "FC2-PPV-2977094",
+    "poster_code": "fc2-ppv-2977094",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm87/fc2-ppv-3074549",
+    "code": "FC2-PPV-3074549",
+    "poster_code": "fc2-ppv-3074549",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm31/pt/fc2-ppv-746281",
+    "code": "FC2-PPV-746281",
+    "poster_code": "fc2-ppv-746281",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm55/fc2-ppv985146",
+    "code": "FC2-PPV985146",
+    "poster_code": "fc2-ppv985146",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm55/fc2ppv-1050737",
+    "code": "FC2PPV-1050737",
+    "poster_code": "fc2ppv-1050737",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm55/fc2ppv-1515992",
+    "code": "FC2PPV-1515992",
+    "poster_code": "fc2ppv-1515992",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm31/fsdss-275",
+    "code": "FSDSS-275",
+    "poster_code": "fsdss-275",
+    "actress": "吉高寧寧 (吉高寧々)"
+  },
+  {
+    "url": "https://missav.ws/dm32/fsdss-320",
+    "code": "FSDSS-320",
+    "poster_code": "fsdss-320",
+    "actress": "橋本有菜 (新有菜) (橋本ありな (新ありな))"
+  },
+  {
+    "url": "https://missav.ws/dm26/200gana-2076",
+    "code": "GANA-2076",
+    "poster_code": "200gana-2076",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm18/hiz-015",
+    "code": "HIZ-015",
+    "poster_code": "hiz-015",
+    "actress": "岸田步美 (岸田歩美)"
+  },
+  {
+    "url": "https://missav.ws/dm41/home-005",
+    "code": "HOME-005",
+    "poster_code": "home-005",
+    "actress": "春菜あいり"
+  },
+  {
+    "url": "https://missav.ws/dm110/iptd-950",
+    "code": "IPTD-950",
+    "poster_code": "iptd-950",
+    "actress": "前田香織 (前田かおり)"
+  },
+  {
+    "url": "https://missav.ws/dm126/iptd-991",
+    "code": "IPTD-991",
+    "poster_code": "iptd-991",
+    "actress": "前田香織 (前田かおり)"
+  },
+  {
+    "url": "https://missav.ws/dm65/ipx-143",
+    "code": "IPX-143",
+    "poster_code": "ipx-143",
+    "actress": "桃乃木香奈 (桃乃木かな)"
+  },
+  {
+    "url": "https://missav.ws/dm70/ipx-343",
+    "code": "IPX-343",
+    "poster_code": "ipx-343",
+    "actress": "岬奈奈美 (岬ななみ)"
+  },
+  {
+    "url": "https://missav.ws/dm84/ipx-506",
+    "code": "IPX-506",
+    "poster_code": "ipx-506",
+    "actress": "岬奈奈美 (岬ななみ)"
+  },
+  {
+    "url": "https://missav.ws/dm72/ipx-564",
+    "code": "IPX-564",
+    "poster_code": "ipx-564",
+    "actress": "楓可憐 (田中檸檬) (楓カレン (田中レモン))"
+  },
+  {
+    "url": "https://missav.ws/dm72/ipx-620",
+    "code": "IPX-620",
+    "poster_code": "ipx-620",
+    "actress": "相澤南 (相沢みなみ)"
+  },
+  {
+    "url": "https://missav.ws/dm82/ipx-772",
+    "code": "IPX-772",
+    "poster_code": "ipx-772",
+    "actress": "藤井一夜 (藤井いよな)"
+  },
+  {
+    "url": "https://missav.ws/dm72/ipx-816",
+    "code": "IPX-816",
+    "poster_code": "ipx-816",
+    "actress": "岬奈奈美 (岬ななみ)"
+  },
+  {
+    "url": "https://missav.ws/dm78/ipx-867",
+    "code": "IPX-867",
+    "poster_code": "ipx-867",
+    "actress": "楓可憐 (田中檸檬) (楓カレン (田中レモン))"
+  },
+  {
+    "url": "https://missav.ws/dm72/ipz-197",
+    "code": "IPZ-197",
+    "poster_code": "ipz-197",
+    "actress": "武井もな"
+  },
+  {
+    "url": "https://missav.ws/dm71/ipz-219",
+    "code": "IPZ-219",
+    "poster_code": "ipz-219",
+    "actress": "武井もな"
+  },
+  {
+    "url": "https://missav.ws/dm79/ipz-266",
+    "code": "IPZ-266",
+    "poster_code": "ipz-266",
+    "actress": "前田香織 (前田かおり)"
+  },
+  {
+    "url": "https://missav.ws/dm70/ipz-514",
+    "code": "IPZ-514",
+    "poster_code": "ipz-514",
+    "actress": "塔堂マリエ"
+  },
+  {
+    "url": "https://missav.ws/dm85/ipz-550",
+    "code": "IPZ-550",
+    "poster_code": "ipz-550",
+    "actress": "立花美涼"
+  },
+  {
+    "url": "https://missav.ws/dm71/ipz-679",
+    "code": "IPZ-679",
+    "poster_code": "ipz-679",
+    "actress": "希島愛里 (希島あいり)"
+  },
+  {
+    "url": "https://missav.ws/dm26/jbs-023",
+    "code": "JBS-023",
+    "poster_code": "jbs-023",
+    "actress": "風見あゆむ"
+  },
+  {
+    "url": "https://missav.ws/dm63/juy-071",
+    "code": "JUY-071",
+    "poster_code": "juy-071",
+    "actress": "最上百合子 (最上ゆり子)"
+  },
+  {
+    "url": "https://missav.ws/dm70/juy-213",
+    "code": "JUY-213",
+    "poster_code": "juy-213",
+    "actress": "最上百合子 (最上ゆり子)"
+  },
+  {
+    "url": "https://missav.ws/dm85/juy-919",
+    "code": "JUY-919",
+    "poster_code": "juy-919",
+    "actress": "海藤瑞穗 (海藤みずほ)"
+  },
+  {
+    "url": "https://missav.ws/dm103/juy-942",
+    "code": "JUY-942",
+    "poster_code": "juy-942",
+    "actress": "高樹明日香 (高樹あすか)"
+  },
+  {
+    "url": "https://missav.ws/dm26/259luxu-1204",
+    "code": "LUXU-1204",
+    "poster_code": "259luxu-1204",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm26/259luxu-1463",
+    "code": "LUXU-1463",
+    "poster_code": "259luxu-1463",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/luxu-389",
+    "code": "LUXU-389",
+    "poster_code": "luxu-389",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm13/luxu-422",
+    "code": "LUXU-422",
+    "poster_code": "luxu-422",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm26/259luxu-831",
+    "code": "LUXU-831",
+    "poster_code": "259luxu-831",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm13/luxu-886",
+    "code": "LUXU-886",
+    "poster_code": "luxu-886",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm13/300maan-244",
+    "code": "MAAN-244",
+    "poster_code": "300maan-244",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm68/mdyd-716",
+    "code": "MDYD-716",
+    "poster_code": "mdyd-716",
+    "actress": "朝霧メイサ"
+  },
+  {
+    "url": "https://missav.ws/dm85/meyd-392",
+    "code": "MEYD-392",
+    "poster_code": "meyd-392",
+    "actress": "東凛"
+  },
+  {
+    "url": "https://missav.ws/dm87/miaa-302",
+    "code": "MIAA-302",
+    "poster_code": "miaa-302",
+    "actress": "篠田優 (篠田ゆう), AIKA"
+  },
+  {
+    "url": "https://missav.ws/dm99/mide-007",
+    "code": "MIDE-007",
+    "poster_code": "mide-007",
+    "actress": "大橋未久"
+  },
+  {
+    "url": "https://missav.ws/dm70/mide-513",
+    "code": "MIDE-513",
+    "poster_code": "mide-513",
+    "actress": "九重環奈 (九重かんな)"
+  },
+  {
+    "url": "https://missav.ws/dm87/mide-834",
+    "code": "MIDE-834",
+    "poster_code": "mide-834",
+    "actress": "七澤米亞 (七沢みあ)"
+  },
+  {
+    "url": "https://missav.ws/dm74/mifd-145",
+    "code": "MIFD-145",
+    "poster_code": "mifd-145",
+    "actress": "麻生瑪格麗特奈奈美 (麻生マーガレット奈々美)"
+  },
+  {
+    "url": "https://missav.ws/dm18/mxbd-123",
+    "code": "MXBD-123",
+    "poster_code": "mxbd-123",
+    "actress": "吉澤明步 (吉沢明歩)"
+  },
+  {
+    "url": "https://missav.ws/dm31/mxgs-1078",
+    "code": "MXGS-1078",
+    "poster_code": "mxgs-1078",
+    "actress": "吉澤明步 (吉沢明歩)"
+  },
+  {
+    "url": "https://missav.ws/dm31/mxgs-899",
+    "code": "MXGS-899",
+    "poster_code": "mxgs-899",
+    "actress": "青山華 (青山はな)"
+  },
+  {
+    "url": "https://missav.ws/dm31/mxgs-994",
+    "code": "MXGS-994",
+    "poster_code": "mxgs-994",
+    "actress": "吉澤明步 (吉沢明歩)"
+  },
+  {
+    "url": "https://missav.ws/dm31/nhdtb-161",
+    "code": "NHDTB-161",
+    "poster_code": "nhdtb-161",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm102/nnpj-303",
+    "code": "NNPJ-303",
+    "poster_code": "nnpj-303",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm70/pred-279",
+    "code": "PRED-279",
+    "poster_code": "pred-279",
+    "actress": "櫻井麻美 (櫻井まみ)"
+  },
+  {
+    "url": "https://missav.ws/dm60/pred-289",
+    "code": "PRED-289",
+    "poster_code": "pred-289",
+    "actress": "櫻井麻美 (櫻井まみ)"
+  },
+  {
+    "url": "https://missav.ws/dm71/pred-316",
+    "code": "PRED-316",
+    "poster_code": "pred-316",
+    "actress": "希島愛里 (希島あいり)"
+  },
+  {
+    "url": "https://missav.ws/dm31/rctd-082",
+    "code": "RCTD-082",
+    "poster_code": "rctd-082",
+    "actress": "宮澤由香里 (宮沢ゆかり), 桐山結羽"
+  },
+  {
+    "url": "https://missav.ws/dm32/real-774",
+    "code": "REAL-774",
+    "poster_code": "real-774",
+    "actress": "白桃花 (白桃はな)"
+  },
+  {
+    "url": "https://missav.ws/dm31/sdde-526",
+    "code": "SDDE-526",
+    "poster_code": "sdde-526",
+    "actress": "久保今日子"
+  },
+  {
+    "url": "https://missav.ws/dm26/sdmu-866",
+    "code": "SDMU-866",
+    "poster_code": "sdmu-866",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm26/sdnm-015",
+    "code": "SDNM-015",
+    "poster_code": "sdnm-015",
+    "actress": "長谷川栞"
+  },
+  {
+    "url": "https://missav.ws/dm13/sdnm-312",
+    "code": "SDNM-312",
+    "poster_code": "sdnm-312",
+    "actress": "坂井千晴"
+  },
+  {
+    "url": "https://missav.ws/dm5/sdsi-031",
+    "code": "SDSI-031",
+    "poster_code": "sdsi-031",
+    "actress": "真木由香里 (真木ゆかり)"
+  },
+  {
+    "url": "https://missav.ws/dm31/sdsi-054",
+    "code": "SDSI-054",
+    "poster_code": "sdsi-054",
+    "actress": "小出亞衣子 (小出亜衣子)"
+  },
+  {
+    "url": "https://missav.ws/dm83/shkd-748",
+    "code": "SHKD-748",
+    "poster_code": "shkd-748",
+    "actress": "石原莉奈"
+  },
+  {
+    "url": "https://missav.ws/dm26/siro-4936",
+    "code": "SIRO-4936",
+    "poster_code": "siro-4936",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm86/snis-665",
+    "code": "SNIS-665",
+    "poster_code": "snis-665",
+    "actress": "吉澤明步 (吉沢明歩)"
+  },
+  {
+    "url": "https://missav.ws/dm55/ssis-365",
+    "code": "SSIS-365",
+    "poster_code": "ssis-365",
+    "actress": "三上悠亞 (三上悠亜)"
+  },
+  {
+    "url": "https://missav.ws/dm56/ssis-700",
+    "code": "SSIS-700",
+    "poster_code": "ssis-700",
+    "actress": "小島南 (小島みなみ)"
+  },
+  {
+    "url": "https://missav.ws/dm59/ssni-827",
+    "code": "SSNI-827",
+    "poster_code": "ssni-827",
+    "actress": "葵司 (葵つかさ)"
+  },
+  {
+    "url": "https://missav.ws/dm58/ssni-884",
+    "code": "SSNI-884",
+    "poster_code": "ssni-884",
+    "actress": "日向真凜 (ひなたまりん)"
+  },
+  {
+    "url": "https://missav.ws/dm30/star-395",
+    "code": "STAR-395",
+    "poster_code": "star-395",
+    "actress": "麻生希"
+  },
+  {
+    "url": "https://missav.ws/dm30/star-395",
+    "code": "STAR-395",
+    "poster_code": "star-395",
+    "actress": "麻生希"
+  },
+  {
+    "url": "https://missav.ws/dm32/star-985",
+    "code": "STAR-985",
+    "poster_code": "star-985",
+    "actress": "羽田愛 (羽田あい)"
+  },
+  {
+    "url": "https://missav.ws/dm43/stars-541",
+    "code": "STARS-541",
+    "poster_code": "stars-541",
+    "actress": "青空光 (青空ひかり)"
+  },
+  {
+    "url": "https://missav.ws/dm1/stars-918",
+    "code": "STARS-918",
+    "poster_code": "stars-918",
+    "actress": "小湊よつ葉"
+  },
+  {
+    "url": "https://missav.ws/dm26/suke-022",
+    "code": "SUKE-022",
+    "poster_code": "suke-022",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm35/team-067",
+    "code": "TEAM-067",
+    "poster_code": "team-067",
+    "actress": "辻本杏"
+  },
+  {
+    "url": "https://missav.ws/dm31/vgd-209",
+    "code": "VGD-209",
+    "poster_code": "vgd-209",
+    "actress": "水森美咲"
+  },
+  {
+    "url": "https://missav.ws/dm13/yal-026",
+    "code": "YAL-026",
+    "poster_code": "yal-026",
+    "actress": "伊織しずく, 井上英李"
+  },
+  {
+    "url": "https://missav.ws/dm13/yrh-044",
+    "code": "YRH-044",
+    "poster_code": "yrh-044",
+    "actress": ""
+  },
+  {
+    "url": "https://missav.ws/dm18/yrh-052",
+    "code": "YRH-052",
+    "poster_code": "yrh-052",
+    "actress": ""
+  }
+];
 
     const grid = document.getElementById("links-grid");
-    const uniqueLinks = [...new Set(links)];
 
     function renderCards(list) {
       grid.innerHTML = "";
-      list.forEach(url => {
-        const code = url.split("/").filter(Boolean).pop().toLowerCase();
-        const posterUrl = `https://fourhoi.com/${code}/cover-n.jpg`;
+      list.forEach(item => {
+        const posterUrl = `https://fourhoi.com/${item.poster_code}/cover-n.jpg`;
 
         const card = document.createElement("a");
-        card.href = url;
+        card.href = item.url;
         card.target = "_blank";
         card.rel = "noopener noreferrer";
         card.className = "card";
+
+        const actressHtml = item.actress 
+          ? `<div class="actress" title="${item.actress}">👤 ${item.actress}</div>` 
+          : `<div class="actress" style="visibility: hidden;">-</div>`;
 
         card.innerHTML = `
           <div class="poster-box" style="background-image: url('${posterUrl}');">
@@ -296,8 +848,11 @@
             </div>
           </div>
           <div class="card-info">
-            <span class="tag">${code}</span>
-            <span class="link-text">${url}</span>
+            <div class="tag-row">
+              <span class="tag">${item.code}</span>
+            </div>
+            ${actressHtml}
+            <span class="link-text">${item.url}</span>
           </div>
         `;
 
@@ -305,14 +860,15 @@
       });
     }
 
-    renderCards(uniqueLinks);
+    renderCards(items);
 
-    // 即時關鍵字搜尋功能
+    // 支援「番號」與「女優」即時搜尋過濾
     document.getElementById("searchInput").addEventListener("input", (e) => {
       const query = e.target.value.toLowerCase().trim();
-      const filtered = uniqueLinks.filter(url => {
-        const code = url.split("/").filter(Boolean).pop().toLowerCase();
-        return code.includes(query) || url.toLowerCase().includes(query);
+      const filtered = items.filter(item => {
+        return item.code.toLowerCase().includes(query) ||
+               item.actress.toLowerCase().includes(query) ||
+               item.url.toLowerCase().includes(query);
       });
       renderCards(filtered);
     });
